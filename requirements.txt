@@ -1,0 +1,4 @@
+numPy==1.14.4
+XlsxWriter==1.0.5
+openpyxl==2.5.3
+xlwt==1.3.0

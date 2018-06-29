@@ -117,13 +117,15 @@ def mainSheet(sheet1, year, duration, amount):
     subtotal = 0
 
     # the first set needs to be independent as it sets the initial values
+    # row 3
     for index, col in enumerate(cols):
         if index == 2:
             sheet1.write(row,index,"months")
         if index == 3:
-            sheet1.write(row, index, xlwt.Formula("=A"+str(7)))
+            sheet1.write(row, index, xlwt.Formula("A"+str(7)))
         if 3 < index < 15:
-            sheet1.write(row,index, xlwt.Forula("="+col+""+row-1))
+            sheet1.write(row,index, xlwt.Formula((cols[index-1]+""+str(realrow))+str(-1)))
+    #row 4
     row = row + 1
     realrow = realrow + 1
     for index, col in enumerate(cols):
@@ -132,19 +134,39 @@ def mainSheet(sheet1, year, duration, amount):
         if index == 2:
             sheet1.write(row, index, "Payment")
         if index  == 3:
-            sheet1.write(row, index, xlwt.Formula("=PMT("+cols[index]+""+str(realrow-2)+"/100/12,"+cols[index]+""+str(realrow-1)+","+cols[index-3]+""+str(realrow-2)+")"))
+            sheet1.write(row, index, xlwt.Formula("PMT("+cols[index]+""+str(realrow-2)+"/100/12,"+cols[index]+""+str(realrow-1)+","+cols[index-3]+""+str(realrow-2)+")"))
         if 3 < index < 15:
-            sheet1.write(row, index, xlwt.Formula("=PMT("+cols[index]+""+str(realrow-2)+"/100/12,"+cols[index]+""+str(realrow-1)+","+cols[index-1]+""+str(realrow+1)+")"))
-    sheet1.write(row,15, xlwt.Formula("=SUM(D"+str(realrow)+":O"+str(realrow)))
+            sheet1.write(row, index, xlwt.Formula("PMT("+cols[index]+""+str(realrow-2)+"/100/12,"+cols[index]+""+str(realrow-1)+","+cols[index-1]+""+str(realrow+1)+")"))
+    #sheet1.write(row,15, xlwt.Formula("SUM(D"+str(realrow)+":O"+str(realrow)))
+    #row 5
     row = row + 1
     realrow = realrow + 1
     for index, col in enumerate(cols):
         if index == 2:
-            sheet1.write(row,index,xlwt.Formula("Remainder"))
+            sheet1.write(row,index,"Remainder")
         if index == 3:
-            sheet1.write(row,index,xlwt.Forumla("=A3+D5+D7-D8"))
+            sheet1.write(row,index,xlwt.Formula("A3+D5+D7-D8"))
         if 3 < index < 15:
-            print("="+cols[index-1]+""+str(realrow)+"+"+col+""+str(realrow-1)+"+"+col+""+str(realrow+1)+"-"+col+""+str(realrow+2))
+            sheet1.write(row,index,xlwt.Formula(cols[index-1]+""+str(realrow)+"+"+col+""+str(realrow-1)+"+"+col+""+str(realrow+1)+"-"+col+""+str(realrow+2)))
+    #row 6
+    row = row +1
+    realrow = realrow +1
+    for index, col in enumerate(cols):
+        if index == 5:
+            sheet1.write(row,index,"Interest")
+        if index == 8:
+            print("(("+
+                cols[index-1]+""+str(realrow-1)+
+                "("+cols[index]+""+str(realrow-4)+
+                "/100))"+"/365)*("+
+                cols[index]+""+str(realrow-5)+"+"+
+                cols[index-1]+""+str(realrow-5)+"+"+
+                cols[index-2]+""+str(realrow-5)+
+                ")")
+        #if index == 11:
+        #    sheet1.write(row,index,xlwt.Formula())
+        #if index == 14:
+        #    sheet1.write(row,index,xlwt.Formula())
 
 def saveAndFinish(book):
     book.save("./spreadsheets/"+str(int(time.time()))+"_mortgage.xls")

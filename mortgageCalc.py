@@ -1,5 +1,7 @@
 #basic program to show mortgage information
 import xlwt
+import xlrd
+
 import time
 import calendar
 import argparse
@@ -20,7 +22,7 @@ def createWorkbook():
     return book
 
 def createSheet(book):
-    sheet1 = book.add_sheet("Mortgage")
+    sheet1 = book.add_sheet("Mortgage",cell_overwrite_ok=False)
     return sheet1
 
 def writeSkeleton(sheet1, year, interest, duration, amount):
@@ -28,7 +30,7 @@ def writeSkeleton(sheet1, year, interest, duration, amount):
     #get variables from parser
     print(year)
     cols = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"]
-    #ROW0
+    #ROW1
     for index, col in enumerate(cols):
         if index == 2:
             sheet1.write(0,index,"MONTH")
@@ -37,136 +39,146 @@ def writeSkeleton(sheet1, year, interest, duration, amount):
         if index == 15:
             sheet1.write(0,index, "total_interest_paid")
 
-    #ROW1
-    for index, col in enumerate(cols):
-        if index == 0:
-            sheet1.write(1,index, "Starting Amount")
-        if index == 2:
-            sheet1.write(1,index, "DAYS")
-        if 2 < index < 15:
-            sheet1.write(1,index, calendar.monthrange(int(year),index-2)[1])
-            print(calendar.monthrange(2011,index-2)[1])
-            #sheet1.write(1,index, calendar.monthrange(2011,index-2)[1])
-
-    #ROW3
-    for index, col in enumerate(cols):
-        if index == 0:
-            sheet1.write(2,index, int(amount))
-        if index == 2:
-            sheet1.write(2,index, "Interest%")
-        if 2 < index < 15:
-            sheet1.write(2, index, float(interest))
-
     #now for the Present
     sheet1.write(3,0,"Years")
     sheet1.write(4,0, int(duration))
     sheet1.write(5,0,"Months")
     sheet1.write(6,0, xlwt.Formula("A5*12"))
 
-def testSheet():
-    cols = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"]
 
-    row = 3
-    realrow = 4
-    row = row + 1
-    realrow = realrow + 1
-    subtotal = 0
+def rowTwoDays(sheet1, row, year):
+    cols = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"]
+    realrow = row + 1
+    print "rowTwoDays "+str(realrow)
     for index, col in enumerate(cols):
+        if index == 0 and realrow == 2:
+            sheet1.write(row, index, "Starting Amount")
         if index == 2:
-            print ("current index is " + str(index))
-            print ("current col is " + col)
-            print ("index less 1 is " + str(index-1))
-            #print ("col less 1 is " + col-1)
-            print ("other way for col is " + cols[index])
-            print ("other way for col less 1 is " + cols[index-1])
-            print ("current row is "+str(row)+" written as "+str(row+1)+ "  in real sheet")
-            print ("real row is "+str(realrow))
+            sheet1.write(row, index, "DAYS")
+        if 2 < index < 15:
+            sheet1.write(row, index, calendar.monthrange(int(year),index-2)[1])
 
-    for index, col in enumerate(cols):
-        if index == 3:
-            print("=PMT("+cols[index]+""+str(realrow-2)+"/100/12,"+cols[index]+""+str(realrow-1)+","+cols[index-3]+""+str(realrow-2)+")")
-        if 3 < index < 15:
-            #sheet1.write(row, index, xlwt.Formula("=PMT("+cols[index]+""+row-2+"/100/12,"+cols[index]+""+row-1+","+cols[index-3]+""+row-2+")"))
-            print("=PMT("+cols[index]+""+str(realrow-2)+"/100/12,"+cols[index]+""+str(realrow-1)+","+cols[index-1]+""+str(realrow+1)+")")
-    print("=SUM(D"+str(realrow)+":O"+str(realrow))
 
-    row = row + 1
-    realrow = realrow + 1
-
-    for index, col in enumerate(cols):
-        if index == 3:
-            print("=A3+D5+D7-D8")
-        if 3 < index < 15:
-            print("="+cols[index-1]+""+str(realrow)+"+"+col+""+str(realrow-1)+"+"+col+""+str(realrow+1)+"-"+col+""+str(realrow+2))
-
-def mainSheet(sheet1, year, duration, amount):
+def rowThreeInterest(sheet1, row, interest):
     cols = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"]
-    #row0=monthnames
-    #row1=days in the month
-    #row2=interest rate
-    #row3=Months
-    #row4=payments (and current year in row B)
-    #row5=remainder
-    #row6=Interest
-    #row7=extrapayments
-    #row8=DAYS
-    #row9=interest rate
-    #repeat
-    row = 3
-    realrow =  4
-    subtotal = 0
+    realrow = row + 1
+    for index, col in enumerate(cols):
+        if index == 0 and realrow == 3:
+            sheet1.write(row, index, int(amount))
+        elif index == 2:
+            sheet1.write(row, index, "Interest%")
+        elif index == 3:
+            if realrow == 3:
+                sheet1.write(row, index, float(interest))
+            else:
+                sheet1.write(row, index, xlwt.Formula((cols[14])+str(realrow-7)))
+        elif 3 < index < 15:
+            sheet1.write(row, index, xlwt.Formula((cols[index-1]+str(realrow))))
 
-    # the first set needs to be independent as it sets the initial values
-    # row 3
+
+def rowFourMonths(sheet1, row):
+    cols = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"]
+    realrow = row + 1
     for index, col in enumerate(cols):
         if index == 2:
             sheet1.write(row,index,"months")
-        if index == 3:
-            sheet1.write(row, index, xlwt.Formula("A"+str(7)))
-        if 3 < index < 15:
+        elif index == 3:
+            if realrow == 4:
+                sheet1.write(row, index, xlwt.Formula("A"+str(7)))
+            else:
+                sheet1.write(row, index, xlwt.Formula((cols[14])+str(realrow-7)+str(-1)))
+        elif 3 < index < 15:
             sheet1.write(row,index, xlwt.Formula((cols[index-1]+""+str(realrow))+str(-1)))
-    #row 4
-    row = row + 1
-    realrow = realrow + 1
+
+
+def rowFivePayment(sheet1, row, year):
+    cols = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"]
+    realrow = row + 1
     for index, col in enumerate(cols):
         if index == 1:
             sheet1.write(row, index, year)
-        if index == 2:
+        elif index == 2:
             sheet1.write(row, index, "Payment")
-        if index  == 3:
-            sheet1.write(row, index, xlwt.Formula("PMT("+cols[index]+""+str(realrow-2)+"/100/12,"+cols[index]+""+str(realrow-1)+","+cols[index-3]+""+str(realrow-2)+")"))
-        if 3 < index < 15:
+        elif index  == 3:
+            if realrow == 5:
+                sheet1.write(row, index, xlwt.Formula("PMT("+cols[index]+""+str(realrow-2)+"/100/12,"+cols[index]+""+str(realrow-1)+","+cols[index-3]+""+str(realrow-2)+")"))
+            else:
+                sheet1.write(row, index, xlwt.Formula("PMT("+cols[index]+""+str(realrow-2)+"/100/12,"+cols[index]+""+str(realrow-1)+","+cols[14]+str(realrow-7)+")"))
+        elif 3 < index < 15:
             sheet1.write(row, index, xlwt.Formula("PMT("+cols[index]+""+str(realrow-2)+"/100/12,"+cols[index]+""+str(realrow-1)+","+cols[index-1]+""+str(realrow+1)+")"))
-    #sheet1.write(row,15, xlwt.Formula("SUM(D"+str(realrow)+":O"+str(realrow)))
-    #row 5
-    row = row + 1
-    realrow = realrow + 1
+
+
+def rowSixRemainder(sheet1, row):
+    cols = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"]
+    realrow = row + 1
     for index, col in enumerate(cols):
         if index == 2:
             sheet1.write(row,index,"Remainder")
         if index == 3:
-            sheet1.write(row,index,xlwt.Formula("A3+D5+D7-D8"))
+            if realrow == 6:
+                sheet1.write(row,index,xlwt.Formula("A3+D5+D7-D8"))
+            else:
+                sheet1.write(row, index, xlwt.Formula((cols[14])+str(realrow-7)))
         if 3 < index < 15:
             sheet1.write(row,index,xlwt.Formula(cols[index-1]+""+str(realrow)+"+"+col+""+str(realrow-1)+"+"+col+""+str(realrow+1)+"-"+col+""+str(realrow+2)))
-    #row 6
-    row = row +1
-    realrow = realrow +1
+
+
+#TODO: fix
+def rowSevenInterest(sheet1, row):
+    cols = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"]
+    realrow = row + 1
     for index, col in enumerate(cols):
-        if index == 5:
+        if index == 2:
             sheet1.write(row,index,"Interest")
-        if index == 8:
-            print("(("+
+        if index == 5 or index == 8 or index == 11 or index == 14:
+            sheet1.write(row,index,xlwt.Formula("(("+
                 cols[index-1]+""+str(realrow-1)+
-                "("+cols[index]+""+str(realrow-4)+
+                "*("+cols[index]+""+str(realrow-4)+
                 "/100))"+"/365)*("+
                 cols[index]+""+str(realrow-5)+"+"+
                 cols[index-1]+""+str(realrow-5)+"+"+
                 cols[index-2]+""+str(realrow-5)+
-                ")")
-        #if index == 11:
-        #    sheet1.write(row,index,xlwt.Formula())
-        #if index == 14:
-        #    sheet1.write(row,index,xlwt.Formula())
+                ")"))
+
+#TODO: fix
+def rowEightExtra(sheet1, row):
+    cols = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"]
+    realrow = row + 1
+    for index, col in enumerate(cols):
+        if index == 2:
+            sheet.write(row,index,"Extra Pay")
+        if 2< index < 15:
+            sheet1.write(row, index, "")
+
+def mainSheet(sheet1, year, duration, amount):
+    cols = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"]
+    row = 0
+    subtotal = 0
+    count = int(duration) + 1
+    while (count > 0):
+        row += 1
+        rowTwoDays(sheet1, row, year)
+
+        row += 1
+        rowThreeInterest(sheet1, row, interest)
+
+        row += 1
+        rowFourMonths(sheet1, row)
+
+        row += 1
+        rowFivePayment(sheet1, row, year)
+
+        row += 1
+        rowSixRemainder(sheet1, row)
+
+        row += 1
+        rowSevenInterest(sheet1, row)
+
+        row += 1
+        rowEightExtra(sheet1, row)
+
+        year = int(year) + 1
+        count = int(count) - 1
 
 def saveAndFinish(book):
     book.save("./spreadsheets/"+str(int(time.time()))+"_mortgage.xls")
@@ -181,6 +193,5 @@ startYear = args['startYear']
 book=createWorkbook()
 sheet=createSheet(book)
 writeSkeleton(sheet, year, interest, duration, amount)
-testSheet()
 mainSheet(sheet, year, duration, amount)
 saveAndFinish(book)

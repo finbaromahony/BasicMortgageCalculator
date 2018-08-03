@@ -1,7 +1,7 @@
 #basic program to show mortgage information
 import xlwt
-import xlrd
 
+import os
 import time
 import calendar
 import argparse
@@ -13,8 +13,6 @@ parser.add_argument('-i','--interest', help='interest rate', required=True)
 parser.add_argument('-d','--duration', help='duration of mortgage in years', required=True)
 parser.add_argument('-a','--amount', help='initial amount of mortgage', required=True)
 args = vars(parser.parse_args())
-#neeed input arguments ssssssssso that wwe caaaaaaaaaan calcuuuulate the number of days
-#need to introduce argeparce
 
 def createWorkbook():
     # Create a new Workbook
@@ -49,7 +47,6 @@ def writeSkeleton(sheet1, year, interest, duration, amount):
 def rowTwoDays(sheet1, row, year):
     cols = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"]
     realrow = row + 1
-    print "rowTwoDays "+str(realrow)
     for index, col in enumerate(cols):
         if index == 0 and realrow == 2:
             sheet1.write(row, index, "Starting Amount")
@@ -181,6 +178,9 @@ def mainSheet(sheet1, year, duration, amount):
         count = int(count) - 1
 
 def saveAndFinish(book):
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    if not os.path.exists(dir_path + '/spreadsheets'):
+        os.mkdir(dir_path + '/spreadsheets')
     book.save("./spreadsheets/"+str(int(time.time()))+"_mortgage.xls")
     # -*- coding: utf-8 -*-
 

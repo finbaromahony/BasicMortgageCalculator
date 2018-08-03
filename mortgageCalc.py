@@ -96,11 +96,11 @@ def rowFivePayment(sheet1, row, year):
             sheet1.write(row, index, year)
         elif index == 2:
             sheet1.write(row, index, "Payment")
-        elif index  == 3:
+        elif index == 3:
             if realrow == 5:
                 sheet1.write(row, index, xlwt.Formula("PMT("+cols[index]+""+str(realrow-2)+"/100/12,"+cols[index]+""+str(realrow-1)+","+cols[index-3]+""+str(realrow-2)+")"))
             else:
-                sheet1.write(row, index, xlwt.Formula("PMT("+cols[index]+""+str(realrow-2)+"/100/12,"+cols[index]+""+str(realrow-1)+","+cols[14]+str(realrow-7)+")"))
+                sheet1.write(row, index, xlwt.Formula("PMT("+cols[index]+""+str(realrow-2)+"/100/12,"+cols[index]+""+str(realrow-1)+","+cols[14]+str(realrow-6)+")"))
         elif 3 < index < 15:
             sheet1.write(row, index, xlwt.Formula("PMT("+cols[index]+""+str(realrow-2)+"/100/12,"+cols[index]+""+str(realrow-1)+","+cols[index-1]+""+str(realrow+1)+")"))
 
@@ -120,7 +120,6 @@ def rowSixRemainder(sheet1, row):
             sheet1.write(row,index,xlwt.Formula(cols[index-1]+""+str(realrow)+"+"+col+""+str(realrow-1)+"+"+col+""+str(realrow+1)+"-"+col+""+str(realrow+2)))
 
 
-#TODO: fix
 def rowSevenInterest(sheet1, row):
     cols = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"]
     realrow = row + 1
@@ -137,7 +136,7 @@ def rowSevenInterest(sheet1, row):
                 cols[index-2]+""+str(realrow-5)+
                 ")"))
 
-#TODO: fix
+
 def rowEightExtra(sheet1, row):
     cols = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"]
     realrow = row + 1

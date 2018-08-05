@@ -188,7 +188,10 @@ def row_six_remainder(sheet1, row, style):
             if real_row == 6:
                 sheet1.write(row, index, xlwt.Formula("A3+D5+D7-D8"), style)
             else:
-                sheet1.write(row, index, xlwt.Formula((cols[14])+str(real_row-7)), style)
+#                sheet1.write(row, index, xlwt.Formula((cols[14])+str(real_row-7)), style)
+                sheet1.write(row, index, xlwt.Formula((cols[14]) + "" + str(real_row-7) + "+" + col + ""
+                             + str(real_row - 1) + "+" + col + "" + str(real_row + 1) + "-" + col +
+                             "" + str(real_row + 2)), style)
         if 3 < index < 15:
             sheet1.write(row, index, xlwt.Formula(cols[index - 1] + "" + str(real_row) + "+" + col + ""
                                                   + str(real_row - 1) + "+" + col + "" + str(real_row + 1) + "-" + col +

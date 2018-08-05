@@ -10,8 +10,6 @@ output in the spreadsheet more readable (colours, fonts etc)
 ## dependencies
 pip install xlwt
 
-pip install xlrd
-
 ## execution
 ```
 mortgageCalc.py --startMonth <month> --startYear <year> --interest <initial interest rate> \

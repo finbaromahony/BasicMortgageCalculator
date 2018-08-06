@@ -11,8 +11,9 @@ output in the spreadsheet more readable (colours, fonts etc)
 pip install xlwt
 
 ## execution
+### Note: startMonth has not been implemented yet
 ```
-mortgageCalc.py --startMonth <month> --startYear <year> --interest <initial interest rate> \
+mortgageCalc.py [--startMonth <month>] --startYear <year> --interest <initial interest rate> \
                 --duration <length in years> --amount <value of mortgage>
 ```
 

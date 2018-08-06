@@ -7,7 +7,7 @@ import calendar
 import argparse
 
 parser = argparse.ArgumentParser(description='TBD')
-parser.add_argument('-sm', '--startMonth', help='start month eg. 04', required=True)
+parser.add_argument('-sm', '--startMonth', help='start month eg. 04', required=False)
 parser.add_argument('-sy', '--startYear', help='start year eg. 2011', required=True)
 parser.add_argument('-i', '--interest', help='interest rate', required=True)
 parser.add_argument('-d', '--duration', help='duration of mortgage in years', required=True)

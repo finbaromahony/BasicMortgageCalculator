@@ -6,15 +6,6 @@ import time
 import calendar
 import argparse
 
-parser = argparse.ArgumentParser(description='TBD')
-parser.add_argument('-sm', '--startMonth', help='start month eg. 04', required=True)
-parser.add_argument('-sy', '--startYear', help='start year eg. 2011', required=True)
-parser.add_argument('-i', '--interest', help='interest rate', required=True)
-parser.add_argument('-d', '--duration', help='duration of mortgage in years', required=True)
-parser.add_argument('-a', '--amount', help='initial amount of mortgage', required=True)
-args = vars(parser.parse_args())
-
-
 def create_workbook():
     # Create a new Workbook
     new_book = xlwt.Workbook(encoding="utf-8")
@@ -222,12 +213,12 @@ def row_eight_extra(sheet1, row, style):
     cols = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"]
     for index, col in enumerate(cols):
         if index == 2:
-            sheet.write(row, index, "Extra Pay", style)
+            sheet1.write(row, index, "Extra Pay", style)
         if 2 < index < 15:
             sheet1.write(row, index, "", style)
 
 
-def main_sheet(sheet1, main_year, main_duration, main_amount, main_style):
+def main_sheet(sheet1, interest, main_year, main_duration, main_amount, main_style):
     row = 0
     count = int(main_duration) + 1
     while count > 0:
@@ -257,23 +248,35 @@ def main_sheet(sheet1, main_year, main_duration, main_amount, main_style):
 
 
 def save_and_finish(new_book):
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    if not os.path.exists(dir_path + '/spreadsheets'):
-        os.mkdir(dir_path + '/spreadsheets')
-    new_book.save("./spreadsheets/"+str(int(time.time()))+"_mortgage.xls")
+    #dir_path = os.path.dirname(os.path.realpath(__file__))
+    #if not os.path.exists(dir_path + '/spreadsheets'):
+    #    os.mkdir(dir_path + '/spreadsheets')
+    #new_book.save("./spreadsheets/"+str(int(time.time()))+"_mortgage.xls")
+    new_book.save("./" + str(int(time.time())) + "_mortgage.xls")
     # -*- coding: utf-8 -*-
 
 
-year = args['startYear']
-interest = args['interest']
-duration = args['duration']
-amount = args['amount']
-startMonth = args['startMonth']
-startYear = args['startYear']
-book = create_workbook()
-sheet = create_sheet(book)
-style_list = create_styles()
-adjust_columns(sheet)
-write_skeleton(sheet, duration)
-main_sheet(sheet, year, duration, amount, style_list)
-save_and_finish(book)
+def main():
+    parser = argparse.ArgumentParser(description='TBD')
+    parser.add_argument('-sm', '--startMonth', help='start month eg. 04', required=False)
+    parser.add_argument('-sy', '--startYear', help='start year eg. 2011', required=True)
+    parser.add_argument('-i', '--interest', help='interest rate', required=True)
+    parser.add_argument('-d', '--duration', help='duration of mortgage in years', required=True)
+    parser.add_argument('-a', '--amount', help='initial amount of mortgage', required=True)
+    args = vars(parser.parse_args())
+    year = args['startYear']
+    interest = args['interest']
+    duration = args['duration']
+    amount = args['amount']
+    startMonth = args['startMonth']
+    startYear = args['startYear']
+    book = create_workbook()
+    sheet = create_sheet(book)
+    style_list = create_styles()
+    adjust_columns(sheet)
+    write_skeleton(sheet, duration)
+    main_sheet(sheet, interest, year, duration, amount, style_list)
+    save_and_finish(book)
+
+if __name__=='__main__':
+    main()

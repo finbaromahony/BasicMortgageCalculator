@@ -1,10 +1,12 @@
 from setuptools import setup
+from b_mort_calc.version import __version__ as version 
+
 
 setup(
     name='basic_mortgage_calculator',
     description='Generate Mortgage Spreadsheets',
     url='',
-    version='0.1.0',
+    version=version,
     author='Bent Thumb',
     author_email='redacted@example.com',
     license='MIT',
